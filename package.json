@@ -1,0 +1,20 @@
+{
+  "name": "3_project",
+  "version": "1.0.0",
+  "description": "a backend at chai and code ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "javascript,backend,chai"
+  },
+  "keywords": [
+    "javascript",
+    "backend",
+    "chai"
+  ],
+  "author": "rupesh mandliya",
+  "license": "ISC"
+}
