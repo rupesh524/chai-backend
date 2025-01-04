@@ -1,26 +1,49 @@
-// import mongoose from 'mongoose';
-// import { DB_NAME } from '../constants';    // IMPORT DBNAME
+// // import mongoose from 'mongoose';
+// // import { DB_NAME } from '../constants';    // IMPORT DBNAME
 
-//require ('dotenv').config({path : './env'})
-import dotenv from 'dotenv'
+// //require ('dotenv').config({path : './env'})
+// import dotenv from 'dotenv'
 
+// import DB_CONNECT from './db/index.js';
+
+//  dotenv.config({
+//      path : './env'
+// })
+//  import express from 'express'
+//  const app = express();
+
+// DB_CONNECT()
+// .then(()=>{
+//       app.listen(process.env.PORT || 8000, ()=>{
+//           console.log(`server is running on port : ${process.env.PORT}`);
+//       })
+// })
+// .catch ((err)=>{
+//     console.log("MONGO_DB CONNECTION FAILED", err);
+// })
+
+
+// ye code jo mene likha tha niche wala gpt corrected code hai 
+
+import dotenv from 'dotenv';
+import { app } from './app.js';  // Import app from app.js
 import DB_CONNECT from './db/index.js';
 
- dotenv.config({
-     path : './env'
-})
- import express from 'express'
- const app = express();
+// Load environment variables
+dotenv.config({ path: './env' });
 
+// Connect to the database
 DB_CONNECT()
-.then(()=>{
-      app.listen(process.env.PORT || 8000, ()=>{
-          console.log(`server is running on port : ${process.env.PORT}`);
-      })
-})
-.catch ((err)=>{
-    console.log("MONGO_DB CONNECTION FAILED", err);
-})
+    .then(() => {
+        const PORT = process.env.PORT || 4000;
+        app.listen(PORT, () => {
+            console.log(`🚀 Server running at http://localhost:${PORT}`);
+        });
+    })
+    .catch((err) => {
+        console.log("❌ MONGO_DB CONNECTION FAILED", err);
+    });
+
 
 
 
