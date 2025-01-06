@@ -30,7 +30,7 @@ import { app } from './app.js';  // Import app from app.js
 import DB_CONNECT from './db/index.js';
 
 // Load environment variables
-dotenv.config({ path: './env' });
+dotenv.config({ path: './.env' });    // if error do ./.env 
 
 // Connect to the database
 DB_CONNECT()
