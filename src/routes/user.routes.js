@@ -10,11 +10,11 @@
 
 import { Router } from "express";
 import { registerUser } from "../controllers/user.controller.js";
-
+import { loginUser} from "../controllers/user.controller.js"
 import  {upload} from   "../middlewares/multer.middleware.js"
-
-
-
+import { LogoutUser } from "../controllers/user.controller.js";
+import { verifyJWT}  from "../middlewares/auth.middleware.js"
+import { requestAccessToken } from "../middlewares/auth.middleware.js"
 const router = Router();
 
 // Define the POST route for user registration
@@ -33,9 +33,15 @@ router.route("/register").post(
     registerUser
 );
 
+router.route("/login").post(loginUser)
+ 
+
+// secured route first go to verifyjwt middleware the logout the user  securedf because user is logged in 
+router.route("/logout").post(verifyJWT, LogoutUser)
 
 
-
+// isme verify jwt ki jarurat nahi hai 
+router.route("/refresh-token").post(refreshAccessToken)
 
 // Export the router
 export default router;

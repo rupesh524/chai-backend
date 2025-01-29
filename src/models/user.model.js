@@ -62,13 +62,13 @@ userSchema.pre("save", async function(next) {
 
 
 userSchema.methods.isPasswordCorrect =  async function(password){
-   return await bcrypt.compare(password,this.password)
+   return await bcrypt.compare(password,this.password)         // this.password database me jo password store hai 
 }
 
     // access 
 userSchema.methods.generateAccessToken = function(){
      return jwt.sign({                                    // this wali chij jo hai database se aa rahi hai 
-           _id : this.id,
+           _id : this._id,
            email : this.email,
            username  : this.username,
            fullName :  this.fullName,
@@ -83,7 +83,7 @@ userSchema.methods.generateAccessToken = function(){
 
 userSchema.methods.refreshAccessToken = function(){
    return jwt.sign({
-      _id : this.id,
+      _id : this._id,
    },
    process.env.REFRESH_TOKEN_SECRET,
    {

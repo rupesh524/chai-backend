@@ -61,7 +61,7 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 // Middleware to serve static files (like images, PDFs)
 app.use(express.static("public"));
 
-// Middleware to handle cookies
+// Middleware to handle cookies cookie pass kar sakte hai 
 app.use(cookieParser());
 
 // Mount user routes to API path
