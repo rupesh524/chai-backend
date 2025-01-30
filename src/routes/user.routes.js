@@ -14,7 +14,7 @@ import { loginUser} from "../controllers/user.controller.js"
 import  {upload} from   "../middlewares/multer.middleware.js"
 import { LogoutUser } from "../controllers/user.controller.js";
 import { verifyJWT}  from "../middlewares/auth.middleware.js"
-import { requestAccessToken } from "../middlewares/auth.middleware.js"
+import { refreshAccessToken } from "../middlewares/auth.middleware.js"
 const router = Router();
 
 // Define the POST route for user registration

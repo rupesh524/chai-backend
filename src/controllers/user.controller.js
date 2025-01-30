@@ -222,7 +222,10 @@ const user = await User.create({
    })
 
 
-   const requestAccessToken = asyncHandler(async(req,res) =>{
+
+
+
+   const refreshAccessToken = asyncHandler(async(req,res) =>{
           // isse ham refresh token lete hai || koi mobile app se kare toh woh yha aayega 
        const incomingRefreshToken =    req.cookies.refreshToken || req.body.refreshToken;
         if(!incomingRefreshToken){
@@ -249,7 +252,7 @@ const user = await User.create({
                   httpOnly : true,
                   secure : true
              }
-    
+                      // name conflict ke liye new liya hai 
              const {accessToken,newrefreshToken} = await generateAccessTokenAndRefreshToken(user._id)
               
              return res
@@ -276,7 +279,6 @@ export {
     registerUser,
     loginUser,
     LogoutUser,
-    requestAccessToken
-
+    refreshAccessToken
 };
 
