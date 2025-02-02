@@ -273,12 +273,129 @@ const user = await User.create({
         }
    })
 
+   const changeCurrentPassword = asyncHandler(async(req,res) =>{
+                 // frontend se old password or new password le lo 
+              const {oldPassword , newPassword} = req.body
+                      // we can take user from req.user because in middilware we assigned user to it req.user.id se find kar sakte hai 
+              const user = await User.findById(req.user?._id)
+              
+              const isPasswordCorrect = user.isPasswordCorrect(oldPassword);
+              if(!isPasswordCorrect){
+                 throw new ApiError(400,"Invalid password")
+              }
+
+            //   new password will be saved in database 
+              user.password = newPassword
+               
+              // save karte time wha bata raha hai validate nahi karna hai 
+              await   user.save({validateBeforeSave : false})
+              
 
 
+
+   })
+
+
+     // in middleware we have assigned full user to req.user , so we can directly fetch through req.user
+   const getCurrentUser = asyncHandler(async(req,res)=>{
+             
+         return res.status(200)
+         .json(
+            200,req.user,"current user fetched successfully"
+         )
+          
+   })
+
+
+   const updateAccountDetails = asyncHandler(async(req,res) =>{
+             const {fullname,email} = req.body
+             if(!fullname || !email){
+                 throw new ApiError(400,"all fields are required")
+             }
+            const user =   User.findByIdAndUpdate(
+                    req.user._id,
+                    {
+                       $set :{
+                           fullname,
+                           email : email
+                       }
+                    },
+                    {new : true}    // new true means jo bhi hamari new information hai wo show hogi ab return me 
+                                    // jo ham set karke karenge 
+
+              ).select("-password")    // password nahi chaiye hame user return karenge waha 
+             
+              return res.status(200)
+              .json(200,user,"Account Details Updated SuccessFully ")
+   })
+      
+
+   // files update kartna hai 
+    const updateUserAvatar = asyncHandler(async(req,res)=>{
+              const avatarLocalPath = req.file?.url
+              if(!avatarLocalPath){
+                 throw new ApiError(400,"Avatar file is missing")
+              }
+              const avatar =  await uploadOnCloudinary(avatarLocalPath);
+              if(!avatar.url){
+                 throw new ApiError(400,"error occured while uploading avatar")
+              }
+
+            const user =   await User.findByIdAndUpdate(
+                   req.user?._id,
+                   {
+                     $set : {
+                         avatar : avatar.url
+                     }
+                   },
+                   {new : true}
+
+              ).select("-password")
+
+        return res.status(200)
+        .json(
+            new ApiResponse(200,user,"avatar image updated successfully ")
+        )
+    })
+
+    const UpdateCoverImage = asyncHandler(async(req,res)=>{
+        const  CoverImageLocalPath = req.file?.url
+        if(!CoverImageLocalPath){
+           throw new ApiError(400,"cover file   is missing")
+        }
+        const coverurl =  await uploadOnCloudinary(CoverImageLocalPath);
+        if(!coverurl.url){
+           throw new ApiError(400,"error occured while uploading cover image")
+        }
+
+       const user =  await User.findByIdAndUpdate(
+             req.user?._id,
+             {
+               $set : {
+                coverImage : coverImage.url
+               }
+             },
+             {new : true}
+
+        ).select("-password")
+
+        return res.status(200)
+        .json(
+            new ApiResponse(200,user,"cover image updated successfully")
+        )
+
+})
+    
 export { 
     registerUser,
     loginUser,
     LogoutUser,
-    refreshAccessToken
+    refreshAccessToken,
+    changeCurrentPassword,
+    getCurrentUser,
+    updateAccountDetails,
+    updateUserAvatar,
+    UpdateCoverImage
+
 };
 
