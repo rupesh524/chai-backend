@@ -16,6 +16,7 @@ import {User}   from "../models/user.model.js"
 import {uploadOnCloudinary}   from "../utils/cloudinary.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import jwt from "jsonwebtoken"
+import { application } from "express";
 
 const generateAccessTokenAndRefreshToken = async(userId)=>{
             try {
@@ -36,9 +37,6 @@ const generateAccessTokenAndRefreshToken = async(userId)=>{
 
             }
 }
-
-
-
 
 
 const registerUser = asyncHandler(async(req, res) => {
@@ -290,6 +288,10 @@ const user = await User.create({
               // save karte time wha bata raha hai validate nahi karna hai 
               await   user.save({validateBeforeSave : false})
               
+              return res.status(200)
+              .json(
+                   new ApiResponse(200,{},"password changed successfully")
+              )
 
 
 
@@ -301,7 +303,7 @@ const user = await User.create({
              
          return res.status(200)
          .json(
-            200,req.user,"current user fetched successfully"
+          new ApiResponse(200,req.user,"current user fetched successfully")
          )
           
    })
@@ -385,6 +387,142 @@ const user = await User.create({
         )
 
 })
+
+    const getUserChannelProfile = asyncHandler(async(req,res)=>{
+
+              const {username} = req.params   // extracting username from the url 
+ 
+              if(!username?.trim()) {          // trim removes whitespaces 
+                    throw new ApiError(400,"username is missing")
+              }
+                                       // user  is user model in this 
+            const channel =   User.aggregate([
+                {
+                 $match : {                // filtering users on the based of username in username the channelname 
+                      username : username?.toLowerCase()
+                 }
+                },
+
+                {                               // performed aggregation on user 
+                   $lookup :{           // perfors a join between user and subscribtion 
+                        from : "subscriptions",   // it will make it model in lowercase and plural 
+                        localField : "_id",
+                        foreignField : "channel",
+                        as : "subscribers"   // result of join is stored in it 
+                   }
+                },
+                {
+                    $lookup :{
+                        from : "subscriptions",
+                        localField : "_id",
+                        foreignField : "Subscriber",
+                        as : "Subscribedto"
+                    }
+                },
+                { 
+                    $addFields :{         // nayi fields add karega 
+                           SubscriberCount :{    // subscriber count nam ki new field add ho jayegi 
+                               $size : "$subscribers"    // size ek aggregation operator
+                                                          //  hai jisse subscribers array me kitne elements hai nikal jayega  
+                           },
+                           channelSubscribedTocount : {
+                              $size : "$Subscribedto"
+                           },
+                           isSubscribed:{  // button kese show karna hai agar pehle se subscribe kiya hua hai toh 
+                                            // subscribed batana hai nahi toh subscribe show karna hai 
+                             $cond:{    // in ek operator hai jo wo user us subscribe wale me hai ya nahi hai toh true kardoo 
+                                        // nahi toh false kardo 
+                                if : {$in:[req.user?._id, "subscribers.subscriber"]},
+                                then : true,
+                                else : false 
+                             }
+                           }
+                    }
+                },
+                {
+                     $project :{
+                        fullname : 1,
+                        username : 1,
+                        SubscriberCount : 1,
+                        channelSubscribedTocount : 1,
+                        isSubscribed : 1,
+                        avatar : 1,
+                        coverImage : 1,
+                        email : 1
+                     }
+                }
+               
+
+            ])
+            if(!channel?.length){
+               throw new ApiError(404, "channel does not exist")
+            }
+            return res
+            .status(200)
+            .json(
+                new ApiResponse(200,channel[0],"user channel feteched successfully")
+            )
+
+    })
+
+    const GetWatchHistory = asyncHandler(async (req,res) =>{
+            const user  = await User.aggregate([
+                {
+                    $match : {
+                        _id : new mongoose.Types.ObjectId(req.user._id)    // only logged in user will select 
+                    }
+                },
+                {
+                     $lookup :{
+                           from : "videos",
+                           localField : "watchHistory",
+                           foreignField : "_id",
+                           as : "watchhistory",
+                           pipeline :[               // nested pipelines  videos me aa gae ab users pe lookup karenge 
+                            {
+                                 $lookup : {
+                                      from : "users",       // sublookup ab sara data owner ki field me hai 
+                                      localField : "owner",
+                                      foreignField : "_id",
+                                      as :  "owner",
+                                      pipeline :[
+                                        {
+                                             $project :{      // ye ye show karna hai hame 
+                                                  fullname : 1,
+                                                  username : 1,
+                                                  avatar : 1
+                                             }
+                                        }
+                                      ]
+                                 }
+                            },
+                            {
+                                 $addFields :{          // sare data owner ke pass hai uska return type array hai 
+                                      owner :{
+                                        $first : "$owner"
+                                      }                  // us array ka 0th element pe data hai toh usko object bana ke 
+                                                        // bhejege 
+                                     
+                                 }
+                            }
+
+                           ]
+                     }
+                }
+            ])
+            return res.status(200)
+            .json(
+                 new ApiResponse(
+                    200,
+                    user[0].watchHistory,
+                    "watch history fetched successfully"
+                 )
+            )
+    })
+
+
+    
+    
     
 export { 
     registerUser,
@@ -395,7 +533,9 @@ export {
     getCurrentUser,
     updateAccountDetails,
     updateUserAvatar,
-    UpdateCoverImage
+    UpdateCoverImage,
+    getUserChannelProfile,
+    GetWatchHistory
 
 };
 
