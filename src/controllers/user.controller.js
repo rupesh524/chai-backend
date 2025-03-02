@@ -196,9 +196,9 @@ const user = await User.create({
    const LogoutUser = asyncHandler(async (req,res)=>{
          await User.findByIdAndUpdate(
             req.user._id,              // find by req.user._id which will be given by our middleware
-            {
-                 $set :{              // set our new refresh token to undefined 
-                     refreshToken : undefined
+            {            // jo bhi chij hame unset karna hai uska 1 kardo 
+                 $unset :{              // this defiened the field from document  
+                     refreshToken : 1
                  }
             },
             {                 //new true shows the new value of refresh toen which is undefined  

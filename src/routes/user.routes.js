@@ -9,12 +9,12 @@
 // export default router
 
 import { Router } from "express";
-import { changeCurrentPassword, getCurrentUser, getUserChannelProfile, GetWatchHistory, registerUser, updateAccountDetails, UpdateCoverImage, updateUserAvatar } from "../controllers/user.controller.js";
+import { changeCurrentPassword, refreshAccessToken,getCurrentUser, getUserChannelProfile, GetWatchHistory, registerUser, updateAccountDetails, UpdateCoverImage, updateUserAvatar } from "../controllers/user.controller.js";
 import { loginUser} from "../controllers/user.controller.js"
 import  {upload} from   "../middlewares/multer.middleware.js"
 import { LogoutUser } from "../controllers/user.controller.js";
 import { verifyJWT}  from "../middlewares/auth.middleware.js"
-import { refreshAccessToken } from "../middlewares/auth.middleware.js"
+
 const router = Router();
 
 // Define the POST route for user registration
@@ -55,7 +55,7 @@ router.route("/update-account").patch(verifyJWT,updateAccountDetails); // post m
 router.route("/avatar").patch(verifyJWT,upload.single("avatar"),updateUserAvatar)
 
 
-router.route("/cover-image").patch(verifyJWT,upload.single("/coverImage"),UpdateCoverImage);
+router.route("/cover-image").patch(verifyJWT,upload.single("coverImage"),UpdateCoverImage);
 
 
 // particular username ke channel ki profile nikalni hai toh ese hi likhna padega 
